@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Soenneker.Extensions.ByteArray;
 using Soenneker.Extensions.String;
 using Soenneker.Extensions.ValueTask;
-using System.Text;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 
