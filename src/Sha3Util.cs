@@ -81,14 +81,9 @@ public class Sha3Util : ISha3Util
             var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            var result = new StringBuilder(hash.Length * 2);
+            var result = hash.ToStr();
 
-            foreach (byte b in hash)
-            {
-                result.AppendFormat("{0:x2}", b);
-            }
-
-            return result.ToString();
+return result;
         }
     }
 
@@ -100,14 +95,8 @@ public class Sha3Util : ISha3Util
         var hash = new byte[digest.GetDigestSize()];
         digest.DoFinal(hash, 0);
 
-        // Convert the byte array to a hexadecimal string
-        var result = new StringBuilder(hash.Length * 2);
+        var result = hash.ToStr();
 
-        foreach (byte b in hash)
-        {
-            result.AppendFormat("{0:x2}", b);
-        }
-
-        return result.ToString();
+        return result;
     }
 }
