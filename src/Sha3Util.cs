@@ -80,9 +80,9 @@ public class Sha3Util : ISha3Util
             var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            var result = hash.ToStr();
+            string result = hash.ToStr();
 
-return result;
+            return result;
         }
     }
 
@@ -94,7 +94,7 @@ return result;
         var hash = new byte[digest.GetDigestSize()];
         digest.DoFinal(hash, 0);
 
-        var result = hash.ToStr();
+        string result = hash.ToStr();
 
         return result;
     }
