@@ -8,11 +8,15 @@
 
     <ItemGroup>
         <None Remove="appsettings.json" />
+        <None Remove="Resources\testfile.txt" />
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="appsettings.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="Resources\testfile.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 
@@ -26,8 +30,8 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Soenneker.Utils.Test" Version="2.1.25" />
-        <PackageReference Include="Soenneker.Tests.FixturedUnit" Version="2.1.79" />
+        <PackageReference Include="Soenneker.Utils.Test" Version="2.1.29" />
+        <PackageReference Include="Soenneker.Tests.FixturedUnit" Version="2.1.93" />
     </ItemGroup>
 
     <ItemGroup>

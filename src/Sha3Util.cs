@@ -7,6 +7,7 @@ using Soenneker.Extensions.String;
 using Soenneker.Extensions.ValueTask;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
+using Soenneker.Extensions.Task;
 
 namespace Soenneker.Utils.SHA3;
 
@@ -48,11 +49,11 @@ public class Sha3Util : ISha3Util
 
         if (Shake256.IsSupported)
         {
-            result = (await HashFileHardware(filePath)).ToStr();
+            result = (await HashFileHardware(filePath).NoSync()).ToStr();
             return result;
         }
 
-        result = await ComputeFileHashBouncy(filePath, new Sha3Digest(256));
+        result = await ComputeFileHashBouncy(filePath, new Sha3Digest(256)).NoSync();
         return result;
     }
 
@@ -67,12 +68,12 @@ public class Sha3Util : ISha3Util
 
     private static async ValueTask<string> ComputeFileHashBouncy(string filePath, IDigest digest)
     {
-        await using (Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+        await using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
             var buffer = new byte[8192];
             int bytesRead;
 
-            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length).NoSync()) > 0)
             {
                 digest.BlockUpdate(buffer, 0, bytesRead);
             }
@@ -80,7 +81,7 @@ public class Sha3Util : ISha3Util
             var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            string result = hash.ToStr();
+            string result = hash.ToHex();
 
             return result;
         }
@@ -94,7 +95,7 @@ public class Sha3Util : ISha3Util
         var hash = new byte[digest.GetDigestSize()];
         digest.DoFinal(hash, 0);
 
-        string result = hash.ToStr();
+        string result = hash.ToHex();
 
         return result;
     }

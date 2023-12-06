@@ -1,3 +1,5 @@
+using System.IO;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Soenneker.Tests.FixturedUnit;
 using Soenneker.Utils.SHA3;
@@ -34,5 +36,12 @@ public class Sha3UtilTests : FixturedUnitTest
         string result2 = Sha3Util.HashString(test);
 
         result1.Should().Be(result2);
+    }
+
+    [Fact]
+    public async Task HashFile_should_hash()
+    {
+        string result = await Sha3Util.HashFile(Path.Combine("Resources", "testfile.txt"));
+        result.Should().NotBeNullOrEmpty();
     }
 }
