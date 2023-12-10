@@ -24,19 +24,18 @@ public class Sha3Util : ISha3Util
 
     public string HashString(string input, bool log = true)
     {
-        string result;
+        byte[] bytes;
 
         if (Shake256.IsSupported)
-        {
-            result = HashStringHardware(input, log);
-            return result;
-        }
+            bytes = HashStringHardware(input, log);
+        else
+            bytes = ComputeHashBouncy(input, new Sha3Digest(256), log);
 
-        result = ComputeHashBouncy(input, new Sha3Digest(256), log);
+        string result = bytes.ToHex();
         return result;
     }
 
-    private string HashStringHardware(string input, bool log)
+    private byte[] HashStringHardware(string input, bool log)
     {
         if (log)
             _logger.LogDebug("SHA3 hardware hashing is supported, so using System.Security.Cryptography...");
@@ -45,22 +44,19 @@ public class Sha3Util : ISha3Util
 
         byte[] hashed = Shake256.HashData(bytes, 256);
 
-        string result = hashed.ToStr();
-
-        return result;
+        return hashed;
     }
 
     public async ValueTask<string> HashFile(string filePath, bool log = true)
     {
-        string result;
+        byte[] bytes;
 
         if (Shake256.IsSupported)
-        {
-            result = (await HashFileHardware(filePath, log).NoSync()).ToStr();
-            return result;
-        }
+            bytes = await HashFileHardware(filePath, log).NoSync();
+        else
+            bytes = await ComputeFileHashBouncy(filePath, new Sha3Digest(256), log).NoSync();
 
-        result = await ComputeFileHashBouncy(filePath, new Sha3Digest(256), log).NoSync();
+        string result = bytes.ToHex();
         return result;
     }
 
@@ -76,7 +72,7 @@ public class Sha3Util : ISha3Util
         }
     }
 
-    private async ValueTask<string> ComputeFileHashBouncy(string filePath, IDigest digest, bool log)
+    private async ValueTask<byte[]> ComputeFileHashBouncy(string filePath, IDigest digest, bool log)
     {
         if (log)
             _logger.LogDebug("SHA3 hardware hashing is NOT supported, so using BouncyCastle...");
@@ -94,13 +90,11 @@ public class Sha3Util : ISha3Util
             var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
 
-            string result = hash.ToHex();
-
-            return result;
+            return hash;
         }
     }
 
-    private string ComputeHashBouncy(string input, IDigest digest, bool log)
+    private byte[] ComputeHashBouncy(string input, IDigest digest, bool log)
     {
         if (log)
             _logger.LogDebug("SHA3 hardware hashing is NOT supported, so using BouncyCastle...");
@@ -111,8 +105,6 @@ public class Sha3Util : ISha3Util
         var hash = new byte[digest.GetDigestSize()];
         digest.DoFinal(hash, 0);
 
-        string result = hash.ToHex();
-
-        return result;
+        return hash;
     }
 }
