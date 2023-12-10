@@ -2,7 +2,6 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Soenneker.Tests.FixturedUnit;
-using Soenneker.Utils.SHA3;
 using Soenneker.Utils.SHA3.Abstract;
 using Soenneker.Utils.SHA3.Tests;
 using Xunit;
@@ -23,7 +22,7 @@ public class Sha3UtilTests : FixturedUnitTest
     [Fact]
     public void HashString_should_hash_string()
     {
-        string result = Sha3Util.HashString(Faker.Random.AlphaNumeric(20));
+        string result = _util.HashString(Faker.Random.AlphaNumeric(20));
         result.Should().NotBeNullOrEmpty();
     }
 
@@ -32,8 +31,8 @@ public class Sha3UtilTests : FixturedUnitTest
     {
         string? test = Faker.Random.AlphaNumeric(20);
 
-        string result1 = Sha3Util.HashString(test);
-        string result2 = Sha3Util.HashString(test);
+        string result1 = _util.HashString(test);
+        string result2 = _util.HashString(test);
 
         result1.Should().Be(result2);
     }
@@ -41,7 +40,7 @@ public class Sha3UtilTests : FixturedUnitTest
     [Fact]
     public async Task HashFile_should_hash()
     {
-        string result = await Sha3Util.HashFile(Path.Combine("Resources", "testfile.txt"));
+        string result = await _util.HashFile(Path.Combine("Resources", "testfile.txt"));
         result.Should().NotBeNullOrEmpty();
     }
 }
