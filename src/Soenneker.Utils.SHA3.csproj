@@ -14,7 +14,7 @@
         <AssemblyName>Soenneker.Utils.SHA3</AssemblyName>
         <PackageId>Soenneker.Utils.SHA3</PackageId>
         <PackageTags>utils sha3 sha sha-3 sha3util c# .net csharp dotnet</PackageTags>
-        <Copyright>Copyright © 2023 Jake Soenneker</Copyright>
+        <Copyright>Copyright © 2024 Jake Soenneker</Copyright>
         <Authors>Jake Soenneker</Authors>
         <Company>https://soenneker.com</Company>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
