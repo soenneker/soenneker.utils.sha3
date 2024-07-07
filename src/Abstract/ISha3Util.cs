@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Soenneker.Utils.SHA3.Abstract;
@@ -13,5 +14,5 @@ public interface ISha3Util
     string HashString(string input, bool log = true);
 
     [Pure]
-    ValueTask<string> HashFile(string filePath, bool log = true);
+    ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default);
 }

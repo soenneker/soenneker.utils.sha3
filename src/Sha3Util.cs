@@ -1,6 +1,7 @@
 using Soenneker.Utils.SHA3.Abstract;
 using System.Security.Cryptography;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Soenneker.Extensions.ByteArray;
@@ -47,32 +48,32 @@ public class Sha3Util : ISha3Util
         return hashed;
     }
 
-    public async ValueTask<string> HashFile(string filePath, bool log = true)
+    public async ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default)
     {
         byte[] bytes;
 
         if (Shake256.IsSupported)
-            bytes = await HashFileHardware(filePath, log).NoSync();
+            bytes = await HashFileHardware(filePath, log, cancellationToken).NoSync();
         else
-            bytes = await ComputeFileHashBouncy(filePath, new Sha3Digest(256), log).NoSync();
+            bytes = await ComputeFileHashBouncy(filePath, new Sha3Digest(256), log, cancellationToken).NoSync();
 
         string result = bytes.ToHex();
         return result;
     }
 
-    private async ValueTask<byte[]> HashFileHardware(string filePath, bool log)
+    private async ValueTask<byte[]> HashFileHardware(string filePath, bool log, CancellationToken cancellationToken)
     {
         if (log)
             _logger.LogDebug("SHA3 hardware hashing is supported, so using that...");
 
         await using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            byte[] result = await Shake256.HashDataAsync(stream, 256).NoSync();
+            byte[] result = await Shake256.HashDataAsync(stream, 256, cancellationToken).NoSync();
             return result;
         }
     }
 
-    private async ValueTask<byte[]> ComputeFileHashBouncy(string filePath, IDigest digest, bool log)
+    private async ValueTask<byte[]> ComputeFileHashBouncy(string filePath, IDigest digest, bool log, CancellationToken cancellationToken)
     {
         if (log)
             _logger.LogDebug("SHA3 hardware hashing is NOT supported, so using BouncyCastle...");
@@ -82,7 +83,7 @@ public class Sha3Util : ISha3Util
             var buffer = new byte[8192];
             int bytesRead;
 
-            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length).NoSync()) > 0)
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken).NoSync()) > 0)
             {
                 digest.BlockUpdate(buffer, 0, bytesRead);
             }
