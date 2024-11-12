@@ -40,7 +40,7 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
         <PackageReference Include="Soenneker.Extensions.String" Version="2.1.257" />
         <PackageReference Include="Soenneker.Extensions.Task" Version="2.1.66" />
