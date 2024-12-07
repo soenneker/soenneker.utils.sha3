@@ -4,11 +4,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Soenneker.Extensions.ByteArray;
 using Soenneker.Extensions.String;
 using Soenneker.Extensions.ValueTask;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
+using Soenneker.Extensions.Arrays.Bytes;
 using Soenneker.Extensions.Task;
 
 namespace Soenneker.Utils.SHA3;
