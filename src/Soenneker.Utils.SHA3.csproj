@@ -13,7 +13,7 @@
         <Version Condition="'$(BUILD_VERSION)' != ''">$(BUILD_VERSION)</Version>
         <AssemblyName>Soenneker.Utils.SHA3</AssemblyName>
         <PackageId>Soenneker.Utils.SHA3</PackageId>
-        <PackageTags>utils sha3 sha sha-3 sha3util c# .net csharp dotnet</PackageTags>
+        <PackageTags>utils sha3 sha sha-3 sha3util c# .net csharp dotnet shake shake256</PackageTags>
         <Copyright>Copyright © 2023-2024 Jake Soenneker</Copyright>
         <Authors>Jake Soenneker</Authors>
         <Company>https://soenneker.com</Company>
