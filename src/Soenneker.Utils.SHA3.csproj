@@ -42,6 +42,6 @@
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
         <PackageReference Include="Soenneker.Extensions.String" Version="3.0.359" />
-        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="3.0.74" />
+        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="3.0.75" />
     </ItemGroup>
 </Project>
