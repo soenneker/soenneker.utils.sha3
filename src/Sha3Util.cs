@@ -1,3 +1,4 @@
+using System;
 using Soenneker.Utils.SHA3.Abstract;
 using System.Security.Cryptography;
 using System.IO;
@@ -9,7 +10,8 @@ using Soenneker.Extensions.ValueTask;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Soenneker.Extensions.Arrays.Bytes;
-using Soenneker.Extensions.Task;
+using System.Buffers;
+using System.Text;
 
 namespace Soenneker.Utils.SHA3;
 
@@ -32,8 +34,7 @@ public class Sha3Util : ISha3Util
         else
             bytes = ComputeHashBouncy(input, new Sha3Digest(256), log);
 
-        string result = bytes.ToHex();
-        return result;
+        return bytes.ToHex();
     }
 
     private byte[] HashStringHardware(string input, bool log)
@@ -43,9 +44,7 @@ public class Sha3Util : ISha3Util
 
         byte[] bytes = input.ToBytes();
 
-        byte[] hashed = Shake256.HashData(bytes, 256);
-
-        return hashed;
+        return Shake256.HashData(bytes, 256);
     }
 
     public async ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default)
@@ -57,55 +56,72 @@ public class Sha3Util : ISha3Util
         else
             bytes = await ComputeFileHashBouncy(filePath, new Sha3Digest(256), log, cancellationToken).NoSync();
 
-        string result = bytes.ToHex();
-        return result;
+        return bytes.ToHex();
     }
 
     private async ValueTask<byte[]> HashFileHardware(string filePath, bool log, CancellationToken cancellationToken)
     {
         if (log)
-            _logger.LogDebug("SHA3 hardware hashing is supported, so using that...");
+            _logger.LogDebug("SHA3 hardware hashing is supported, using that...");
 
-        await using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-        {
-            byte[] result = await Shake256.HashDataAsync(stream, 256, cancellationToken).NoSync();
-            return result;
-        }
+        // Open the file stream with buffer size for improved performance
+        await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920, options: FileOptions.Asynchronous);
+
+        // Perform hashing with the stream
+        return await Shake256.HashDataAsync(stream, 256, cancellationToken).NoSync();
     }
 
     private async ValueTask<byte[]> ComputeFileHashBouncy(string filePath, IDigest digest, bool log, CancellationToken cancellationToken)
     {
         if (log)
-            _logger.LogDebug("SHA3 hardware hashing is NOT supported, so using BouncyCastle...");
+            _logger.LogDebug("SHA3 hardware hashing is NOT supported, using BouncyCastle...");
 
-        await using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+        // Use a pre-allocated buffer and FileStream with optimal settings
+        await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920, options: FileOptions.Asynchronous);
+
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(8192); // Use ArrayPool to reduce allocations
+
+        try
         {
-            var buffer = new byte[8192];
             int bytesRead;
-
-            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken).NoSync()) > 0)
+            while ((bytesRead = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken).NoSync()) > 0)
             {
                 digest.BlockUpdate(buffer, 0, bytesRead);
             }
 
             var hash = new byte[digest.GetDigestSize()];
             digest.DoFinal(hash, 0);
-
             return hash;
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer, clearArray: true);
         }
     }
 
-    private byte[] ComputeHashBouncy(string input, IDigest digest, bool log)
+    private byte[] ComputeHashBouncy(string input, Sha3Digest digest, bool log)
     {
         if (log)
-            _logger.LogDebug("SHA3 hardware hashing is NOT supported, so using BouncyCastle...");
+            _logger.LogDebug("SHA3 hardware hashing is NOT supported, using BouncyCastle...");
 
-        byte[] data = input.ToBytes();
-        digest.BlockUpdate(data, 0, data.Length);
+        // Use ArrayPool to minimize allocations for byte conversion
+        byte[] inputBytes = ArrayPool<byte>.Shared.Rent(input.Length * sizeof(char));
 
-        var hash = new byte[digest.GetDigestSize()];
-        digest.DoFinal(hash, 0);
+        try
+        {
+            int byteCount = Encoding.UTF8.GetBytes(input, 0, input.Length, inputBytes, 0);
 
-        return hash;
+            digest.BlockUpdate(inputBytes, 0, byteCount);
+
+            // Compute the final hash
+            var hash = new byte[digest.GetDigestSize()];
+            digest.DoFinal(hash, 0);
+
+            return hash;
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(inputBytes, clearArray: true);
+        }
     }
 }

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System.Threading.Tasks;
 using Soenneker.Fixtures.Unit;
 using Soenneker.Utils.SHA3.Registrars;
 using Soenneker.Utils.Test;
