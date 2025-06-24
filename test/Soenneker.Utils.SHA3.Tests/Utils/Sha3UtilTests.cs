@@ -40,7 +40,14 @@ public class Sha3UtilTests : FixturedUnitTest
     [Fact]
     public async Task HashFile_should_hash()
     {
-        string result = await _util.HashFile(Path.Combine("Resources", "testfile.txt"));
+        string result = await _util.HashFile(Path.Combine("Resources", "testfile.txt"), true, CancellationToken);
+        result.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task HashDirectory_should_hash()
+    {
+        string result = await _util.HashDirectory(@"c:\cloudflare", true, CancellationToken);
         result.Should().NotBeNullOrEmpty();
     }
 }

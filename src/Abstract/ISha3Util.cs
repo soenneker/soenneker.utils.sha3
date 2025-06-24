@@ -28,4 +28,7 @@ public interface ISha3Util
     /// <returns>A task representing the asynchronous operation. The result contains the hexadecimal string representation of the hash.</returns>
     [Pure]
     ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default);
+
+    [Pure]
+    ValueTask<string> HashDirectory(string directoryPath, bool log = true, CancellationToken cancellationToken = default);
 }

@@ -1,22 +1,24 @@
-using System;
-using Soenneker.Utils.SHA3.Abstract;
-using System.Security.Cryptography;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Soenneker.Extensions.String;
-using Soenneker.Extensions.ValueTask;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Soenneker.Extensions.Arrays.Bytes;
+using Soenneker.Extensions.String;
+using Soenneker.Extensions.ValueTask;
+using Soenneker.Utils.SHA3.Abstract;
+using System;
 using System.Buffers;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Soenneker.Utils.SHA3;
 
 /// <inheritdoc cref="ISha3Util"/>
-public class Sha3Util : ISha3Util
+public sealed class Sha3Util : ISha3Util
 {
     private readonly ILogger<Sha3Util> _logger;
 
@@ -57,6 +59,51 @@ public class Sha3Util : ISha3Util
             bytes = await ComputeFileHashBouncy(filePath, new Sha3Digest(256), log, cancellationToken).NoSync();
 
         return bytes.ToHex();
+    }
+
+    public async ValueTask<string> HashDirectory(string directoryPath, bool log = true, CancellationToken cancellationToken = default)
+    {
+        if (log)
+            _logger.LogDebug("Hashing all files in directory ({DirectoryPath})...", directoryPath);
+
+        List<string> filePaths = Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories).OrderBy(p => p, StringComparer.Ordinal).ToList();
+
+        if (log)
+            _logger.LogDebug("Found {FileCount} files to hash in directory ({DirectoryPath})", filePaths.Count, directoryPath);
+
+        if (filePaths.Count == 0)
+            return string.Empty;
+
+        IHashAggregator hashAggregator;
+
+        if (Shake256.IsSupported)
+        {
+            hashAggregator = new IncrementalHashWrapper(IncrementalHash.CreateHash(HashAlgorithmName.SHA3_256));
+        }
+        else
+        {
+            hashAggregator = new DigestWrapper(new Sha3Digest(256));
+        }
+
+        foreach (string filePath in filePaths)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            string fileHashHex = await HashFile(filePath, log: false, cancellationToken).NoSync();
+            byte[] fileHash = Convert.FromHexString(fileHashHex);
+
+            string relativePath = Path.GetRelativePath(directoryPath, filePath);
+            byte[] pathBytes = relativePath.ToBytes();
+
+            hashAggregator.Update(pathBytes);
+            hashAggregator.Update(fileHash);
+        }
+
+        string result = hashAggregator.Finish().ToHex();
+
+        hashAggregator.Dispose();
+
+        return result;
     }
 
     private async ValueTask<byte[]> HashFileHardware(string filePath, bool log, CancellationToken cancellationToken)
