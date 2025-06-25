@@ -90,7 +90,7 @@ public sealed class Sha3Util : ISha3Util
             cancellationToken.ThrowIfCancellationRequested();
 
             string fileHashHex = await HashFile(filePath, log: false, cancellationToken).NoSync();
-            byte[] fileHash = Convert.FromHexString(fileHashHex);
+            byte[] fileHash = fileHashHex.ToBytesFromHex();
 
             string relativePath = Path.GetRelativePath(directoryPath, filePath);
             byte[] pathBytes = relativePath.ToBytes();
