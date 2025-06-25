@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using Soenneker.Facts.Local;
 using Soenneker.Tests.FixturedUnit;
 using Soenneker.Utils.SHA3.Abstract;
 using Soenneker.Utils.SHA3.Tests;
@@ -44,7 +45,7 @@ public class Sha3UtilTests : FixturedUnitTest
         result.Should().NotBeNullOrEmpty();
     }
 
-    [Fact]
+    [LocalFact]
     public async Task HashDirectory_should_hash()
     {
         string result = await _util.HashDirectory(@"c:\cloudflare", true, CancellationToken);
