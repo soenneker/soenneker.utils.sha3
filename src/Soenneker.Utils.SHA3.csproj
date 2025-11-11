@@ -40,7 +40,7 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-        <PackageReference Include="Soenneker.Extensions.String" Version="4.0.567" />
+        <PackageReference Include="Soenneker.Extensions.String" Version="4.0.568" />
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="4.0.96" />
     </ItemGroup>
 </Project>
