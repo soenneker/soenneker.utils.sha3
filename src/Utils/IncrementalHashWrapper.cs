@@ -1,7 +1,8 @@
-﻿using System.Security.Cryptography;
-using Soenneker.Utils.SHA3.Abstract;
+﻿using Soenneker.Utils.SHA3.Utils.Abstract;
+using System;
+using System.Security.Cryptography;
 
-namespace Soenneker.Utils.SHA3;
+namespace Soenneker.Utils.SHA3.Utils;
 
 internal sealed class IncrementalHashWrapper : IHashAggregator
 {
@@ -12,7 +13,7 @@ internal sealed class IncrementalHashWrapper : IHashAggregator
         _incrementalHash = incrementalHash;
     }
 
-    public void Update(byte[] data) => _incrementalHash.AppendData(data);
+    public void Update(ReadOnlySpan<byte> data) => _incrementalHash.AppendData(data);
 
     public byte[] Finish() => _incrementalHash.GetHashAndReset();
 
