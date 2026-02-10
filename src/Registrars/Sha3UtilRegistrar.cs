@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Soenneker.Utils.Directory.Registrars;
 using Soenneker.Utils.SHA3.Abstract;
 
 namespace Soenneker.Utils.SHA3.Registrars;
@@ -14,7 +15,7 @@ public static class Sha3UtilRegistrar
     /// </summary>
     public static IServiceCollection AddSha3UtilAsSingleton(this IServiceCollection services)
     {
-        services.TryAddSingleton<ISha3Util, Sha3Util>();
+        services.AddDirectoryUtilAsSingleton().TryAddSingleton<ISha3Util, Sha3Util>();
 
         return services;
     }
@@ -24,7 +25,7 @@ public static class Sha3UtilRegistrar
     /// </summary>
     public static IServiceCollection AddSha3UtilAsScoped(this IServiceCollection services)
     {
-        services.TryAddScoped<ISha3Util, Sha3Util>();
+        services.AddDirectoryUtilAsScoped().TryAddScoped<ISha3Util, Sha3Util>();
 
         return services;
     }

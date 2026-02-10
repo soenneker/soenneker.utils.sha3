@@ -3,6 +3,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Soenneker.Extensions.Arrays.Bytes;
 using Soenneker.Extensions.ValueTask;
+using Soenneker.Utils.Directory.Abstract;
 using Soenneker.Utils.SHA3.Abstract;
 using Soenneker.Utils.SHA3.Utils;
 using Soenneker.Utils.SHA3.Utils.Abstract;
@@ -22,6 +23,7 @@ namespace Soenneker.Utils.SHA3;
 public sealed class Sha3Util : ISha3Util
 {
     private readonly ILogger<Sha3Util> _logger;
+    private readonly IDirectoryUtil _directoryUtil;
 
     // Bigger read buffer tends to reduce syscalls for large files
     private const int _fileReadBufferSize = 128 * 1024;
@@ -29,9 +31,10 @@ public sealed class Sha3Util : ISha3Util
     // FileStream internal buffer (81920 is the typical default; keep it)
     private const int _streamBufferSize = 81_920;
 
-    public Sha3Util(ILogger<Sha3Util> logger)
+    public Sha3Util(ILogger<Sha3Util> logger, IDirectoryUtil directoryUtil)
     {
         _logger = logger;
+        _directoryUtil = directoryUtil;
     }
 
     public string HashString(string input, bool log = true)
@@ -55,9 +58,8 @@ public sealed class Sha3Util : ISha3Util
             _logger.LogDebug("Hashing all files in directory ({DirectoryPath})...", directoryPath);
 
         // Keep stable ordering for deterministic directory hashes
-        List<string> filePaths = Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories)
-                                          .OrderBy(static p => p, StringComparer.Ordinal)
-                                          .ToList();
+        List<string> filePaths = await _directoryUtil.GetFilesByExtension(directoryPath, "", true, cancellationToken);
+        filePaths.Sort(StringComparer.Ordinal);
 
         if (doLog)
             _logger.LogDebug("Found {FileCount} files to hash in directory ({DirectoryPath})", filePaths.Count, directoryPath);
@@ -75,7 +77,7 @@ public sealed class Sha3Util : ISha3Util
             byte[] fileHash = await HashFileBytes(filePath, log: false, cancellationToken)
                 .NoSync();
 
-            string relativePath = Path.GetRelativePath(directoryPath, filePath);
+            string relativePath = System.IO.Path.GetRelativePath(directoryPath, filePath);
 
             // Feed path bytes without allocating a new byte[] each time when possible
             int pathByteCount = Encoding.UTF8.GetByteCount(relativePath);
