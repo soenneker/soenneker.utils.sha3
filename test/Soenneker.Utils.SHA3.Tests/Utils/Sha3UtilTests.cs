@@ -1,4 +1,3 @@
-using System.IO;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Facts.Local;
@@ -41,7 +40,7 @@ public class Sha3UtilTests : FixturedUnitTest
     [Fact]
     public async Task HashFile_should_hash()
     {
-        string result = await _util.HashFile(Path.Combine("Resources", "testfile.txt"), true, CancellationToken);
+        string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, CancellationToken);
         result.Should().NotBeNullOrEmpty();
     }
 
