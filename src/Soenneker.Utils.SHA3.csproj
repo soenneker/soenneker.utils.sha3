@@ -42,6 +42,6 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.787" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.788" />
     </ItemGroup>
 </Project>
