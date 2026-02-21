@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
@@ -42,6 +43,6 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.787" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.788" />
     </ItemGroup>
 </Project>
