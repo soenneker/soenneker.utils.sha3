@@ -99,7 +99,7 @@ public sealed class Sha3Util : ISha3Util
                              .ToHex();
     }
 
-    private IHashAggregator CreateAggregator()
+    private static IHashAggregator CreateAggregator()
     {
         if (Shake256.IsSupported)
             return new IncrementalHashWrapper(IncrementalHash.CreateHash(HashAlgorithmName.SHA3_256));
