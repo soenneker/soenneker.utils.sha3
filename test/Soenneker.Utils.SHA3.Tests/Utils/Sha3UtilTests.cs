@@ -1,32 +1,31 @@
 using System.Threading.Tasks;
 using AwesomeAssertions;
-using Soenneker.Facts.Local;
-using Soenneker.Tests.FixturedUnit;
+using Soenneker.Tests.Attributes.Local;
+using Soenneker.Tests.HostedUnit;
 using Soenneker.Utils.SHA3.Abstract;
 using Soenneker.Utils.SHA3.Tests;
-using Xunit;
 
 
 namespace Soenneker.Utils.Sha3.Tests.Utils;
 
-[Collection("Collection")]
-public class Sha3UtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class Sha3UtilTests : HostedUnitTest
 {
     private readonly ISha3Util _util;
 
-    public Sha3UtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public Sha3UtilTests(Host host) : base(host)
     {
         _util = Resolve<ISha3Util>();
     }
 
-    [Fact]
+    [Test]
     public void HashString_should_hash_string()
     {
         string result = _util.HashString(Faker.Random.AlphaNumeric(20));
         result.Should().NotBeNullOrEmpty();
     }
 
-    [Fact]
+    [Test]
     public void HashString_should_hash_string_consistently()
     {
         string? test = Faker.Random.AlphaNumeric(20);
@@ -37,14 +36,14 @@ public class Sha3UtilTests : FixturedUnitTest
         result1.Should().Be(result2);
     }
 
-    [Fact]
+    [Test]
     public async Task HashFile_should_hash()
     {
         string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, CancellationToken);
         result.Should().NotBeNullOrEmpty();
     }
 
-    [LocalFact]
+    [LocalOnly]
     public async Task HashDirectory_should_hash()
     {
         string result = await _util.HashDirectory(@"c:\cloudflare", true, CancellationToken);
