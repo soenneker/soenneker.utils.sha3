@@ -39,14 +39,15 @@ public class Sha3UtilTests : HostedUnitTest
     [Test]
     public async Task HashFile_should_hash()
     {
-        string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, CancellationToken);
+        string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, System.Threading.CancellationToken.None);
         result.Should().NotBeNullOrEmpty();
     }
 
     [LocalOnly]
     public async Task HashDirectory_should_hash()
     {
-        string result = await _util.HashDirectory(@"c:\cloudflare", true, CancellationToken);
+        string result = await _util.HashDirectory(@"c:\cloudflare", true, System.Threading.CancellationToken.None);
         result.Should().NotBeNullOrEmpty();
     }
 }
+
