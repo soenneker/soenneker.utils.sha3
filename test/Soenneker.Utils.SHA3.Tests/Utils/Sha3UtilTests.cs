@@ -15,7 +15,7 @@ public class Sha3UtilTests : HostedUnitTest
 
     public Sha3UtilTests(Host host) : base(host)
     {
-        _util = Resolve<ISha3Util>();
+        _util = Resolve<ISha3Util>(true);
     }
 
     [Test]
