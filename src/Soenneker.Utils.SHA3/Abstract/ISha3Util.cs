@@ -29,6 +29,13 @@ public interface ISha3Util
     [Pure]
     ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes the hash directory operation.
+    /// </summary>
+    /// <param name="directoryPath">The directory path.</param>
+    /// <param name="log">The log.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task containing the result of the operation.</returns>
     [Pure]
     ValueTask<string> HashDirectory(string directoryPath, bool log = true, CancellationToken cancellationToken = default);
 }

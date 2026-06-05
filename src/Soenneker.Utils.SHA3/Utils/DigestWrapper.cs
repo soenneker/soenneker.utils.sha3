@@ -5,6 +5,7 @@ using System.Buffers;
 
 namespace Soenneker.Utils.SHA3.Utils;
 
+/// <inheritdoc cref="IHashAggregator"/>
 public sealed class DigestWrapper : IHashAggregator
 {
     private readonly IDigest _digest;
@@ -38,6 +39,9 @@ public sealed class DigestWrapper : IHashAggregator
         return hash;
     }
 
+    /// <summary>
+    /// Releases resources used by the current instance.
+    /// </summary>
     public void Dispose()
     {
         // No resources to dispose
