@@ -32,6 +32,14 @@ public sealed class DigestWrapper : IHashAggregator
         }
     }
 
+    public void Update(byte[] data, int offset, int count)
+    {
+        if (count == 0)
+            return;
+
+        _digest.BlockUpdate(data, offset, count);
+    }
+
     public byte[] Finish()
     {
         var hash = new byte[_digest.GetDigestSize()];

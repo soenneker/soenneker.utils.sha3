@@ -37,6 +37,15 @@ public class Sha3UtilTests : HostedUnitTest
     }
 
     [Test]
+    public void HashString_should_match_sha3_256_known_vector()
+    {
+        string result = _util.HashString("abc", log: false);
+
+        result.Should().Be("3A985DA74FE225B2045C172D6BD390BD855F086E3E9D525B46BFE24511431532");
+        result.Should().HaveLength(64);
+    }
+
+    [Test]
     public async Task HashFile_should_hash()
     {
         string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, System.Threading.CancellationToken.None);

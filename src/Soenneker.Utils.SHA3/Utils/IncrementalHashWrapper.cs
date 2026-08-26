@@ -15,6 +15,8 @@ internal sealed class IncrementalHashWrapper : IHashAggregator
 
     public void Update(ReadOnlySpan<byte> data) => _incrementalHash.AppendData(data);
 
+    public void Update(byte[] data, int offset, int count) => _incrementalHash.AppendData(data, offset, count);
+
     public byte[] Finish() => _incrementalHash.GetHashAndReset();
 
     public void Dispose() => _incrementalHash.Dispose();

@@ -27,9 +27,6 @@ public sealed class Sha3Util : ISha3Util
     // Bigger read buffer tends to reduce syscalls for large files
     private const int _fileReadBufferSize = 128 * 1024;
 
-    // FileStream internal buffer (81920 is the typical default; keep it)
-    private const int _streamBufferSize = 81_920;
-
     public Sha3Util(ILogger<Sha3Util> logger, IDirectoryUtil directoryUtil)
     {
         _logger = logger;
@@ -86,12 +83,12 @@ public sealed class Sha3Util : ISha3Util
             {
                 int written = Encoding.UTF8.GetBytes(relativePath, 0, relativePath.Length, pathBuffer, 0);
 
-                hashAggregator.Update(pathBuffer.AsSpan(0, written));
-                hashAggregator.Update(fileHash);
+                hashAggregator.Update(pathBuffer, 0, written);
+                hashAggregator.Update(fileHash, 0, fileHash.Length);
             }
             finally
             {
-                ArrayPool<byte>.Shared.Return(pathBuffer, clearArray: true);
+                ArrayPool<byte>.Shared.Return(pathBuffer);
             }
         }
 
@@ -101,7 +98,7 @@ public sealed class Sha3Util : ISha3Util
 
     private static IHashAggregator CreateAggregator()
     {
-        if (Shake256.IsSupported)
+        if (SHA3_256.IsSupported)
             return new IncrementalHashWrapper(IncrementalHash.CreateHash(HashAlgorithmName.SHA3_256));
 
         return new DigestWrapper(new Sha3Digest(256));
@@ -109,7 +106,7 @@ public sealed class Sha3Util : ISha3Util
 
     private byte[] HashStringBytes(string input, bool log)
     {
-        if (Shake256.IsSupported)
+        if (SHA3_256.IsSupported)
             return HashStringHardwareBytes(input, log);
 
         return ComputeHashBouncyBytes(input, new Sha3Digest(256), log);
@@ -130,18 +127,18 @@ public sealed class Sha3Util : ISha3Util
         {
             int written = Encoding.UTF8.GetBytes(input, 0, input.Length, rented, 0);
 
-            // Prefer span-based input if available
-            return Shake256.HashData(rented.AsSpan(0, written), 256);
+            return SHA3_256.HashData(rented.AsSpan(0, written));
         }
         finally
         {
-            ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+            CryptographicOperations.ZeroMemory(rented.AsSpan(0, byteCount));
+            ArrayPool<byte>.Shared.Return(rented);
         }
     }
 
     private async ValueTask<byte[]> HashFileBytes(string filePath, bool log, CancellationToken cancellationToken)
     {
-        if (Shake256.IsSupported)
+        if (SHA3_256.IsSupported)
             return await HashFileHardwareBytes(filePath, log, cancellationToken)
                 .NoSync();
 
@@ -162,12 +159,13 @@ public sealed class Sha3Util : ISha3Util
             Mode = FileMode.Open,
             Share = FileShare.Read,
             Options = FileOptions.Asynchronous | FileOptions.SequentialScan,
-            BufferSize = _streamBufferSize
+            // SHA3_256.HashDataAsync performs its own buffered reads.
+            BufferSize = 1
         };
 
         await using var stream = new FileStream(filePath, options);
 
-        return await Shake256.HashDataAsync(stream, 256, cancellationToken)
+        return await SHA3_256.HashDataAsync(stream, cancellationToken)
                              .NoSync();
     }
 
@@ -183,7 +181,8 @@ public sealed class Sha3Util : ISha3Util
             Mode = FileMode.Open,
             Share = FileShare.Read,
             Options = FileOptions.Asynchronous | FileOptions.SequentialScan,
-            BufferSize = _streamBufferSize
+            // The explicit pooled read buffer below is the only buffer required.
+            BufferSize = 1
         };
 
         await using var stream = new FileStream(filePath, options);
@@ -208,7 +207,8 @@ public sealed class Sha3Util : ISha3Util
         }
         finally
         {
-            ArrayPool<byte>.Shared.Return(buffer, clearArray: true);
+            CryptographicOperations.ZeroMemory(buffer.AsSpan(0, _fileReadBufferSize));
+            ArrayPool<byte>.Shared.Return(buffer);
         }
     }
 
@@ -234,7 +234,8 @@ public sealed class Sha3Util : ISha3Util
         }
         finally
         {
-            ArrayPool<byte>.Shared.Return(rented, clearArray: true);
+            CryptographicOperations.ZeroMemory(rented.AsSpan(0, byteCount));
+            ArrayPool<byte>.Shared.Return(rented);
         }
     }
 }
