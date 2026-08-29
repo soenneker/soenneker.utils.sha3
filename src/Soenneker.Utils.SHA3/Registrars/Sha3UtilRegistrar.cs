@@ -13,6 +13,7 @@ public static class Sha3UtilRegistrar
     /// <summary>
     /// Adds <see cref="ISha3Util"/> as a singleton service. <para/>
     /// </summary>
+    /// <returns>Adds <see cref="ISha3Util"/> as a singleton service. <para/>.</returns>
     public static IServiceCollection AddSha3UtilAsSingleton(this IServiceCollection services)
     {
         services.AddDirectoryUtilAsSingleton().TryAddSingleton<ISha3Util, Sha3Util>();
@@ -23,6 +24,7 @@ public static class Sha3UtilRegistrar
     /// <summary>
     /// Adds <see cref="ISha3Util"/> as a scoped service. <para/>
     /// </summary>
+    /// <returns>Adds <see cref="ISha3Util"/> as a scoped service. <para/>.</returns>
     public static IServiceCollection AddSha3UtilAsScoped(this IServiceCollection services)
     {
         services.AddDirectoryUtilAsScoped().TryAddScoped<ISha3Util, Sha3Util>();

@@ -8,9 +8,9 @@ namespace Soenneker.Utils.SHA3.Utils.Abstract;
 public interface IHashAggregator : IDisposable
 {
     /// <summary>
-    /// Executes the update operation.
+    /// Adds the supplied bytes to the incremental hash state.
     /// </summary>
-    /// <param name="data">The data.</param>
+    /// <param name="data">The next bytes added to the hash.</param>
     void Update(ReadOnlySpan<byte> data);
 
     /// <summary>
@@ -20,8 +20,8 @@ public interface IHashAggregator : IDisposable
     void Update(byte[] data, int offset, int count) => Update(data.AsSpan(offset, count));
 
     /// <summary>
-    /// Executes the finish operation.
+    /// Finalizes the incremental hash and returns its digest.
     /// </summary>
-    /// <returns>The result of the operation.</returns>
+    /// <returns>The finalized digest bytes.</returns>
     byte[] Finish();
 }

@@ -30,12 +30,12 @@ public interface ISha3Util
     ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Executes the hash directory operation.
+    /// Computes one SHA-3 digest from the relative paths and contents of every file in a directory tree.
     /// </summary>
-    /// <param name="directoryPath">The directory path.</param>
-    /// <param name="log">The log.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="directoryPath">The root directory to hash.</param>
+    /// <param name="log">True to emit operational logging.</param>
+    /// <param name="cancellationToken">Signals that the operation should stop.</param>
+    /// <returns>The lowercase hexadecimal SHA-3 digest.</returns>
     [Pure]
     ValueTask<string> HashDirectory(string directoryPath, bool log = true, CancellationToken cancellationToken = default);
 }
