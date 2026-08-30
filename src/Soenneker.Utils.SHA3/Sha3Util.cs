@@ -9,6 +9,7 @@ using Soenneker.Utils.SHA3.Utils;
 using Soenneker.Utils.SHA3.Utils.Abstract;
 using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
@@ -18,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Utils.SHA3;
 
-/// <inheritdoc cref="ISha3Util"/>
 public sealed class Sha3Util : ISha3Util
 {
     private readonly ILogger<Sha3Util> _logger;
@@ -60,10 +60,8 @@ public sealed class Sha3Util : ISha3Util
         if (doLog)
             _logger.LogDebug("Found {FileCount} files to hash in directory ({DirectoryPath})", filePaths.Count, directoryPath);
 
-        if (filePaths.Count == 0)
-            return string.Empty;
-
         using IHashAggregator hashAggregator = CreateAggregator();
+        var pathLengthBuffer = new byte[sizeof(int)];
 
         foreach (string filePath in filePaths)
         {
@@ -73,7 +71,8 @@ public sealed class Sha3Util : ISha3Util
             byte[] fileHash = await HashFileBytes(filePath, log: false, cancellationToken)
                 .NoSync();
 
-            string relativePath = System.IO.Path.GetRelativePath(directoryPath, filePath);
+            string relativePath = System.IO.Path.GetRelativePath(directoryPath, filePath)
+                                                .Replace(System.IO.Path.DirectorySeparatorChar, '/');
 
             // Feed path bytes without allocating a new byte[] each time when possible
             int pathByteCount = Encoding.UTF8.GetByteCount(relativePath);
@@ -82,7 +81,9 @@ public sealed class Sha3Util : ISha3Util
             try
             {
                 int written = Encoding.UTF8.GetBytes(relativePath, 0, relativePath.Length, pathBuffer, 0);
+                BinaryPrimitives.WriteInt32LittleEndian(pathLengthBuffer, written);
 
+                hashAggregator.Update(pathLengthBuffer, 0, pathLengthBuffer.Length);
                 hashAggregator.Update(pathBuffer, 0, written);
                 hashAggregator.Update(fileHash, 0, fileHash.Length);
             }

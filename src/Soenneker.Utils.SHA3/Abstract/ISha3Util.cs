@@ -6,7 +6,7 @@ namespace Soenneker.Utils.SHA3.Abstract;
 
 /// <summary>
 /// A utility library for SHA-3 hashing. <para/>
-/// Uses the new System.Cryptography SHA3 hardware implementation if available, otherwise uses BouncyCastle.
+/// Uses the platform System.Security.Cryptography SHA3 implementation when available, otherwise uses BouncyCastle.
 /// </summary>
 public interface ISha3Util
 {
@@ -30,12 +30,12 @@ public interface ISha3Util
     ValueTask<string> HashFile(string filePath, bool log = true, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Computes one SHA-3 digest from the relative paths and contents of every file in a directory tree.
+    /// Computes one deterministic SHA3-256 digest from framed relative paths and the content digests of every file in a directory tree.
     /// </summary>
     /// <param name="directoryPath">The root directory to hash.</param>
     /// <param name="log">True to emit operational logging.</param>
     /// <param name="cancellationToken">Signals that the operation should stop.</param>
-    /// <returns>The lowercase hexadecimal SHA-3 digest.</returns>
+    /// <returns>The uppercase hexadecimal SHA3-256 digest.</returns>
     [Pure]
     ValueTask<string> HashDirectory(string directoryPath, bool log = true, CancellationToken cancellationToken = default);
 }
