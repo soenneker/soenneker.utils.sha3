@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Soenneker.Tests.Attributes.Local;
@@ -46,9 +47,9 @@ public class Sha3UtilTests : HostedUnitTest
     }
 
     [Test]
-    public async Task HashFile_should_hash()
+    public async Task HashFile_should_hash(CancellationToken cancellationToken)
     {
-        string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, System.Threading.CancellationToken.None);
+        string result = await _util.HashFile(System.IO.Path.Combine("Resources", "testfile.txt"), true, cancellationToken);
         result.Should().NotBeNullOrEmpty();
     }
 
