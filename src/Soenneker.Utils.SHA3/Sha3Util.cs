@@ -171,7 +171,7 @@ public sealed class Sha3Util : ISha3Util
                              .NoSync();
     }
 
-    private async ValueTask<byte[]> ComputeFileHashBouncyBytes(string filePath, IDigest digest, bool log, CancellationToken cancellationToken)
+    private async ValueTask<byte[]> ComputeFileHashBouncyBytes(string filePath, Sha3Digest digest, bool log, CancellationToken cancellationToken)
     {
         bool doLog = log && _logger.IsEnabled(LogLevel.Debug);
         if (doLog)
