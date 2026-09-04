@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 
 namespace Soenneker.Utils.SHA3;
 
+/// <inheritdoc cref="ISha3Util" />
 public sealed class Sha3Util : ISha3Util
 {
     private readonly ILogger<Sha3Util> _logger;

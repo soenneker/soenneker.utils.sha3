@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 
 namespace Soenneker.Utils.SHA3.Utils;
 
+/// <inheritdoc cref="IHashAggregator" />
 internal sealed class IncrementalHashWrapper : IHashAggregator
 {
     private readonly IncrementalHash _incrementalHash;
