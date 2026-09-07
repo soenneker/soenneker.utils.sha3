@@ -20,11 +20,16 @@ public sealed class DigestWrapper : IHashAggregator
         if (data.IsEmpty)
             return;
 
-        byte[] rented = ArrayPool<byte>.Shared.Rent(data.Length);
+        byte[] rented = ArrayPool<byte>.Shared.Rent(Math.Min(data.Length, 16 * 1024));
         try
         {
-            data.CopyTo(rented);
-            _digest.BlockUpdate(rented, 0, data.Length);
+            while (!data.IsEmpty)
+            {
+                int count = Math.Min(data.Length, rented.Length);
+                data[..count].CopyTo(rented);
+                _digest.BlockUpdate(rented, 0, count);
+                data = data[count..];
+            }
         }
         finally
         {
