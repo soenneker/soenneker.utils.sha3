@@ -30,5 +30,8 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Soenneker.Utils.SHA3\Soenneker.Utils.SHA3.csproj" />
     </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
+    </ItemGroup>
 </Project>
 
