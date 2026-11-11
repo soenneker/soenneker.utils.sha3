@@ -45,10 +45,10 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-        <PackageReference Include="Soenneker.Extensions.Arrays.Bytes" Version="11.0.80" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.975" />
+        <PackageReference Include="Soenneker.Extensions.Arrays.Bytes" Version="11.0.81" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.976" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="11.0.135" />
+        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="11.0.136" />
     </ItemGroup>
 </Project>
