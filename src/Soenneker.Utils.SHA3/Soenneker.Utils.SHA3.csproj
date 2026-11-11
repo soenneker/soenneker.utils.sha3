@@ -46,7 +46,7 @@
     <ItemGroup>
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
         <PackageReference Include="Soenneker.Extensions.Arrays.Bytes" Version="11.0.80" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.973" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.975" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="11.0.135" />
